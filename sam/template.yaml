@@ -1,0 +1,69 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+
+Transform: AWS::Serverless-2016-10-31
+
+# Description: 
+
+# Metadata:
+
+Parameters:
+  TagApplication:
+    Type: String
+    Description: Application name
+    AllowedPattern: '[a-z]*'
+    MinLength: '1'
+    MaxLength: '20'
+
+# Mappings:
+
+# Conditions:
+
+Resources:
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+  Lambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${TagApplication}-lambda
+      CodeUri: ../build
+      Handler: lambda.handler
+      MemorySize: 128
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs8.10
+      Timeout: 5
+      Environment:
+        Variables:
+          TAG_APPLICATION: !Ref TagApplication
+
+  LambdaLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: Lambda
+    Properties: 
+      # Possible values, in days, are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653.
+      RetentionInDays: 1
+      LogGroupName: !Sub /aws/lambda/${Lambda}
+
+# Outputs:

@@ -1,0 +1,34 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "config": {
+    "s3Bucket": "",
+    "awsProfile": "",
+    "region": "",
+    "cfnStackName": "",
+    "tagApplication": ""
+  },
+  "scripts": {
+    "create-bucket": "aws s3 mb s3://$npm_package_config_s3Bucket --region $npm_package_config_region --profile $npm_package_config_awsProfile ",
+    "prebuild": "rm -rf build && rm -rf dist && mkdir build && mkdir dist",
+    "build": "tsc -p tsconfig.json && cp package.json build && cd build && npm install --production",
+    "package": "aws cloudformation package --template-file sam/template.yaml --s3-bucket $npm_package_config_s3Bucket --output-template dist/template-out.yaml --region $npm_package_config_region --profile $npm_package_config_awsProfile",
+    "deploy": "aws cloudformation deploy --template-file dist/template-out.yaml --stack-name $npm_package_config_cfnStackName --capabilities CAPABILITY_NAMED_IAM --region $npm_package_config_region --profile $npm_package_config_awsProfile  --parameter-overrides TagApplication=$npm_package_config_tagApplication",
+    "build-package-deploy": "npm run build && npm run package && npm run deploy",
+    "delete-stack": "aws cloudformation delete-stack --stack-name $npm_package_config_cfnStackName --region $npm_package_config_region --profile $npm_package_config_awsProfile"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.31",
+    "@types/aws-sdk": "^2.7.0",
+    "@types/node": "^12.6.8",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.2"
+  }
+}

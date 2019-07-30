@@ -1,0 +1,1 @@
+export const TAG_APPLICATION = process.env.TAG_APPLICATION
