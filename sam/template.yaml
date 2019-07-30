@@ -44,7 +44,7 @@ Resources:
                   - logs:PutLogEvents
                 Resource: arn:aws:logs:*:*:*
 
-  Lambda:
+  ExampleLambda:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub ${TagApplication}-lambda
@@ -60,10 +60,10 @@ Resources:
 
   LambdaLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: Lambda
+    DependsOn: ExampleLambda
     Properties: 
       # Possible values, in days, are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653.
       RetentionInDays: 1
-      LogGroupName: !Sub /aws/lambda/${Lambda}
+      LogGroupName: !Sub /aws/lambda/${ExampleLambda}
 
 # Outputs:
