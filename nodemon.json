@@ -1,0 +1,7 @@
+{
+  "watch": [
+    "src/**/*.ts"
+  ],
+  "verbose": false,
+  "exec": "ts-node src/dev.ts"
+}
